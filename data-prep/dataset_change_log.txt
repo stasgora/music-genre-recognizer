@@ -1,0 +1,103 @@
+Changes to dataset:
+// genere (removed/added/new total)
+
+blues (0/0/100)
+
+classical (1/2/101)
+-49 static
++0 from jazz
++1 from jazz
+
+country (1/0/99)
+-2 static
+
+disco (7/0/93)
+-50 repetition
+-51 repetition
+-55 repetition
+-60 repetition
+-71 repetition
+-98 repetition
+-23 goes to pop
+
+hiphop (4/1/97)
+-39 glitch (skip)
+-39 repetition
+-76 repetition
++52 from reggae
+-31 goes to pop
+
+jazz (15/1/86)
+-33 repetition
+-34 repetition
+-35 repetition
+-36 repetition
+-37 repetition
+-38 repetition
+-39 repetition
+-40 repetition
+-42 repetition
+-43 repetition
+-44 repetition
+-45 repetition
+-46 repetition
++90 from rock
+-0 goes to classical
+-1 goes to classical
+
+metal (11/0/89)
+-4 repetition
+-34 repetition
+-40 repetition
+-41 repetition
+-42 repetition
+-43 repetition
+-44 repetition
+-45 repetition
+-58 repetition
+-29 goes to rock
+-46 goes to rock
+
+pop (11/5/94)
+-15 repetition
+-30 repetition
+-37 modified 15 with sound effects
+-45 repetition
+-47 repetition
+-52 repetition
+-54 repetition
+-56 repetition
+-67 repetition
+-87 repetition
++27 from rock
++36 from rock
++62 from rock
++23 from disco
++31 from hiphop
+-63 not pop
+
+reggae (13/0/87)
+-3 repetition
+-5 repetition
+-8 repetition
+-10 repetition
+-13 repetition
+-41 repetition
+-73 repetition
+-80 repetition
+-81 repetition
+-75 repetition
+-86 glitch
+-91 repetition
+-52 goes to hiphop
+
+rock (4/2/98)
+-27 goes to pop
+-36 goes to pop
+-62 goes to pop
+-90 goes to jazz
++29 from metal
++46 from metal
+
+Old total: 1000
+New total: 944 (56 removed)
