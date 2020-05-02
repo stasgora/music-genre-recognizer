@@ -32,19 +32,19 @@ def splitDataSet1(mainDir, k):  # main directory containing genres, number of se
 def uniformDatSplitter(mainNormDir, k, lowestNumberOfFiles):
 	j = 0
 	fileSplit = [[] for i in range(k)]
-	for genreDir in os.listdir(mainNormDir):
-		files = os.listdir(mainNormDir + slash + genreDir)
+	for genreDir in filter(lambda file: os.path.isdir(os.path.join(mainNormDir, file)), os.listdir(mainNormDir)):
+		files = os.listdir(os.path.join(mainNormDir, genreDir))
 		i = 0
 		while not len(files) == 0:
 			chosen = random.choice(files)
 			files.remove(chosen)
-			fileSplit[i].append(mainNormDir + slash + genreDir + slash + chosen)
+			fileSplit[i].append(os.path.join(mainNormDir, genreDir, chosen))
 			i += 1
 			if i == k:
 				i = 0
 			j += 1
 			if j == lowestNumberOfFiles:
-				files = [mainNormDir + slash + genreDir + slash + e for e in files]
+				files = [os.path.join(mainNormDir, genreDir, e) for e in files]
 				fileSplit[k - 1].extend(files)
 				break
 	return fileSplit
