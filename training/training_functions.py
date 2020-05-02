@@ -1,4 +1,5 @@
 import librosa
+import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense
 from tensorflow.python.keras.models import load_model
@@ -9,15 +10,16 @@ split_functions = [splitDataSet1, splitDataSet2, splitDataSet3]
 
 
 def create_spectrograms(dataset):
-	spectrograms = []
-	labels = []
+	spectrograms = np.array([])
+	labels = np.array([])
 	for file in dataset:
 		y, sr = librosa.load(file)
 		mfcc = librosa.feature.mfcc(y=y, sr=sr)
-		print(mfcc.shape)
-		spectrograms.append(mfcc)
-		labels.append(file.split('.')[-3])
-	return [spectrograms, labels]
+		np.append(spectrograms, mfcc)
+		np.append(labels, os.path.basename(file).split('.')[-3])
+	size = min(map(lambda x: x.shape, spectrograms))
+	t = [[x[0:size[0]][0:size[1]] for x in spectrograms], labels]
+	return t
 
 
 def load_dataset(split_index, normalized=True):
@@ -33,8 +35,8 @@ def test_network(testing_set, testing_labels, network_path):
 
 def train_network(training_set, training_labels, save_path='network.keras'):
 	model = Sequential([
-		Dense(256, input_shape=(), activation='relu'),
-		Dense(64, input_shape=(), activation='relu'),
+		Dense(256, input_shape=(training_set), activation='relu'),
+		Dense(64, activation='relu'),
 		Dense(10, activation='softmax'),
 	])
 	model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])

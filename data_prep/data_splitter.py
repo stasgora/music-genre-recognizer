@@ -9,13 +9,13 @@ slash = "\\"
 def splitDataSet1(mainDir, k):  # main directory containing genres, number of sets
 	j = 0
 	fileSplit = [[] for i in range(k)]
-	for genreDir in os.listdir(mainDir):
-		files = os.listdir(mainDir + slash + genreDir)
+	for genreDir in filter(lambda file: os.path.isdir(os.path.join(mainDir, file)), os.listdir(mainDir)):
+		files = os.listdir(os.path.join(mainDir, genreDir))
 		i = 0
 		while not len(files) == 0:
 			chosen = random.choice(files)
 			files.remove(chosen)
-			fileSplit[i].append(mainDir + slash + genreDir + slash + chosen)
+			fileSplit[i].append(os.path.join(mainDir, genreDir, chosen))
 			i += 1
 			if i == k:
 				i = 0
