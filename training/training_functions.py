@@ -10,14 +10,16 @@ split_functions = [splitDataSet1, splitDataSet2, splitDataSet3]
 
 
 def create_spectrograms(dataset):
-	spectrograms = np.array([])
-	labels = np.array([])
+	spectrograms = []
+	labels = []
+	size = (0, 0)
 	for file in dataset:
 		y, sr = librosa.load(file)
 		mfcc = librosa.feature.mfcc(y=y, sr=sr)
-		np.append(spectrograms, mfcc)
-		np.append(labels, os.path.basename(file).split('.')[-3])
-	size = min(map(lambda x: x.shape, spectrograms))
+		if size == (0, 0) or mfcc.shape < size:
+			size = mfcc.shape
+		spectrograms.append(mfcc)
+		labels.append(os.path.basename(file).split('.')[-3])
 	t = [[x[0:size[0]][0:size[1]] for x in spectrograms], labels]
 	return t
 

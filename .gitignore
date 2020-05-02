@@ -1,4 +1,7 @@
 data
 data-normalized
+spectr-data
+spectr-data-normalized
+
 .idea
 *.iml
