@@ -1,4 +1,5 @@
 import numpy as np
+import time
 from tensorflow.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense, Flatten
 from tensorflow.python.keras.models import load_model
@@ -28,7 +29,11 @@ def load_dataset(split_index, normalized=True):
 def test_network(testing_set, testing_labels, network_path):
 	print('----TESTING----')
 	model = load_model(network_path)
-	model.evaluate(testing_set, testing_labels)
+	train_time = time.time_ns()
+	history = model.evaluate(testing_set, testing_labels)
+	print((time.time_ns() - train_time) / 1000000)
+	print(history[0])
+	print(history[1])
 
 
 def train_network(training_set, training_labels, save_path='network.keras'):
@@ -42,5 +47,9 @@ def train_network(training_set, training_labels, save_path='network.keras'):
 	model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 	print(model.summary())
 
-	model.fit(training_set, training_labels, epochs=30, batch_size=64, validation_split=0)
+	train_time = time.time_ns()
+	history = model.fit(training_set, training_labels, epochs=15, batch_size=64, validation_split=0)
+	print((time.time_ns() - train_time) / 1000000)
+	print(str(history.history['loss'])[1:-1].replace(',', ''))
+	print(str(history.history['accuracy'])[1:-1].replace(',', ''))
 	model.save(save_path)
