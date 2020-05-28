@@ -4,7 +4,6 @@ import time
 import tensorflow.keras.backend as K
 from tensorflow.keras import metrics
 from tensorflow.keras.models import Sequential
-from tensorflow.python import confusion_matrix
 from tensorflow.python.keras.layers import Dense, Flatten
 from tensorflow.python.keras.utils.np_utils import to_categorical
 
@@ -13,14 +12,18 @@ from data_prep.data_splitter import *
 split_functions = [splitDataSet1, splitDataSet2, splitDataSet3]
 genres = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
 model = None
+divisions = 2
 
 
 def create_spectrograms(dataset):
-	spectrograms = np.empty((len(dataset), 20, 1290))
+	spectrograms = np.empty((int(len(dataset) * divisions), 20, int(1290 / divisions)))
 	labels = []
 	for i in range(len(dataset)):
-		spectrograms[i] = np.load(dataset[i])
-		labels.append(genres.index(os.path.basename(dataset[i]).split('.')[-4]))
+		label = genres.index(os.path.basename(dataset[i]).split('.')[-4])
+		data_points = np.hsplit(np.load(dataset[i]), divisions)
+		for j in range(divisions):
+			spectrograms[i] = data_points[j]
+			labels.append(label)
 	return spectrograms, to_categorical(np.array(labels), num_classes=len(genres))
 
 
