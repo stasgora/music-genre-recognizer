@@ -24,7 +24,7 @@ def create_spectrograms(dataset):
 		for j in range(divisions):
 			spectrograms[i] = data_points[j]
 			labels.append(label)
-	return spectrograms, to_categorical(np.array(labels), num_classes=len(genres))
+	return spectrograms, np.array(labels)
 
 
 def load_dataset(split_index, normalized=True):
@@ -52,16 +52,15 @@ def train_network(training_set, training_labels, save_path='network.keras'):
 		Dense(64, activation='relu'),
 		Dense(10, activation='softmax'),
 	])
-	model_metrics = [metrics.CategoricalAccuracy(), metrics.Recall(), metrics.AUC(),
-	                 metrics.SensitivityAtSpecificity(.8), metrics.SpecificityAtSensitivity(.8), f1_score, fbeta_score]
-	model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=model_metrics)
+	model_metrics = ['accuracy']
+	model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 	print(model.summary())
 
 	train_time = time.time_ns()
 	history = model.fit(training_set, training_labels, epochs=2, batch_size=32, validation_split=0)
 	print((time.time_ns() - train_time) / 1000000)
 	print(str(history.history['loss'])[1:-1].replace(',', ''))
-	print(str(history.history['categorical_accuracy'])[1:-1].replace(',', ''))
+	print(str(history.history['accuracy'])[1:-1].replace(',', ''))
 
 	model.save(save_path)
 
