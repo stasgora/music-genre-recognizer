@@ -19,7 +19,7 @@ def create_spectrograms(dataset, fma_set):
 	spectrograms = np.empty((int(len(dataset) * divisions), 20, int(1290 / divisions)))
 	labels = []
 	for i in range(len(dataset)):
-		genre_name = os.path.basename(dataset[i]).split('.')[-4]
+		genre_name = os.path.split(os.path.split(dataset[i])[0])[1]
 		label = int(genre_name) if fma_set else genres.index(genre_name)
 		data_points = np.hsplit(np.load(dataset[i]), divisions)
 		for j in range(divisions):
