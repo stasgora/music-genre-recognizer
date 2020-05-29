@@ -49,7 +49,7 @@ def uniformDatSplitter(mainNormDir, k, lowestNumberOfFiles):
 				break
 	return fileSplit
 
-def splitDataSet2(mainNormDir, k, lowestNumberOfFiles = 86):
+def splitDataSet2(mainNormDir, k, lowestNumberOfFiles = 999):
 	fileSplit = uniformDatSplitter(mainNormDir, k, lowestNumberOfFiles)
 	finalSet = [[] for i in range(3)]
 	finalSet[2] = fileSplit[k-1]
@@ -61,7 +61,7 @@ def splitDataSet2(mainNormDir, k, lowestNumberOfFiles = 86):
 	return finalSet
 
 
-def splitDataSet3(mainNormDir, k, lowestNumberOfFiles=86):
+def splitDataSet3(mainNormDir, k, lowestNumberOfFiles=999):
 	fileSplit = uniformDatSplitter(mainNormDir, k, lowestNumberOfFiles)
 	finalSet = [[] for i in range(3)]
 	finalSet[2] = fileSplit[k - 1]

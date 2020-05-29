@@ -1,4 +1,7 @@
 data
+fma-data
+spectr-fma-data
+fma/*map
 data-normalized
 spectr-data
 spectr-data-normalized
