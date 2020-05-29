@@ -12,25 +12,31 @@ from data_prep.data_splitter import *
 split_functions = [splitDataSet1, splitDataSet2, splitDataSet3]
 genres = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
 model = None
-divisions = 2
+divisions = 1
 
 
-def create_spectrograms(dataset):
+def create_spectrograms(dataset, fma_set):
 	spectrograms = np.empty((int(len(dataset) * divisions), 20, int(1290 / divisions)))
 	labels = []
 	for i in range(len(dataset)):
-		label = genres.index(os.path.basename(dataset[i]).split('.')[-4])
+		genre_name = os.path.basename(dataset[i]).split('.')[-4]
+		label = int(genre_name) if fma_set else genres.index(genre_name)
 		data_points = np.hsplit(np.load(dataset[i]), divisions)
 		for j in range(divisions):
 			spectrograms[i] = data_points[j]
 			labels.append(label)
-	return spectrograms, to_categorical(np.array(labels), num_classes=len(genres))
+	classes_count = 8 if fma_set else len(genres)
+	return spectrograms, to_categorical(np.array(labels), num_classes=classes_count)
 
 
-def load_dataset(split_index, normalized=True):
-	folder = 'spectr-data-normalized' if normalized else 'spectr-data'
-	split = split_functions[split_index](folder, 5)
-	return [create_spectrograms(split[i]) for i in range(3)]
+def load_dataset(split_index, fma_set=True, normalized=True):
+	if fma_set:
+		normalized = False
+	folder = 'data-normalized' if normalized else 'data'
+	if fma_set:
+		folder = 'fma-' + folder
+	split = split_functions[split_index]('spectr-' + folder, 5)
+	return [create_spectrograms(split[i], fma_set) for i in range(3)]
 
 
 def test_network(testing_set, testing_labels, network_path):
@@ -43,14 +49,15 @@ def test_network(testing_set, testing_labels, network_path):
 	print(history[1])
 
 
-def train_network(training_set, training_labels, save_path='network.keras'):
+def train_network(training_set, training_labels, fma_set=True, save_path='network.keras'):
 	global model
 	print('----TRAINING----')
+	classes_count = 8 if fma_set else len(genres)
 	model = Sequential([
 		Flatten(input_shape=training_set[0].shape),
 		Dense(256, activation='relu'),
 		Dense(64, activation='relu'),
-		Dense(10, activation='softmax'),
+		Dense(classes_count, activation='softmax'),
 	])
 	model_metrics = [metrics.CategoricalAccuracy(), metrics.Recall(), metrics.AUC(),
 	                 metrics.SensitivityAtSpecificity(.8), metrics.SpecificityAtSensitivity(.8), f1_score, fbeta_score]
@@ -58,7 +65,7 @@ def train_network(training_set, training_labels, save_path='network.keras'):
 	print(model.summary())
 
 	train_time = time.time_ns()
-	history = model.fit(training_set, training_labels, epochs=2, batch_size=32, validation_split=0)
+	history = model.fit(training_set, training_labels, epochs=5, batch_size=32, validation_split=0)
 	print((time.time_ns() - train_time) / 1000000)
 	print(str(history.history['loss'])[1:-1].replace(',', ''))
 	print(str(history.history['categorical_accuracy'])[1:-1].replace(',', ''))
