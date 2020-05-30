@@ -8,7 +8,7 @@ TRAIN = 0
 VAL = 1
 TEST = 2
 
-
-dataset = load_dataset(1, fma_set=True, normalized=False)
-train_network(dataset[TRAIN][DATA], dataset[TRAIN][LABELS], fma_set=True, save_path='unnorm_split1.network')
+fma_set=True
+dataset = load_dataset(1, fma_set=fma_set, normalized=False)
+train_network(dataset[TRAIN][DATA], dataset[TRAIN][LABELS], dataset[VAL][DATA], dataset[VAL][LABELS], fma_set=fma_set, save_path='unnorm_split1.network')
 test_network(dataset[VAL][DATA], dataset[VAL][LABELS], network_path='unnorm_split1.network')

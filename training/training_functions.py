@@ -2,9 +2,12 @@ import numpy as np
 import time
 
 import tensorflow.keras.backend as K
+from matplotlib import pyplot
 from tensorflow.keras import metrics
 from tensorflow.keras.models import Sequential
-from tensorflow.python.keras.layers import Dense, Flatten
+from tensorflow.python.keras import regularizers
+from tensorflow.python.keras.callbacks import Callback, EarlyStopping
+from tensorflow.python.keras.layers import Dense, Flatten, Dropout
 from tensorflow.python.keras.utils.np_utils import to_categorical
 
 from data_prep.data_splitter import *
@@ -49,14 +52,42 @@ def test_network(testing_set, testing_labels, network_path):
 	print(history[1])
 
 
-def train_network(training_set, training_labels, fma_set=True, save_path='network.keras'):
+class TestCallback(Callback):
+	def __init__(self, test_data):
+		self.test_data = test_data
+		self.history = {'loss': [], 'f1': []}
+
+	def on_epoch_end(self, epoch, logs={}):
+		x, y = self.test_data
+		history = self.model.evaluate(x, y, verbose=1)
+		self.history['loss'].append(history[0])
+		self.history['f1'].append(history[7])
+
+
+def train_network(training_set, training_labels, testing_set, testing_labels, fma_set=True, save_path='network.keras'):
 	global model
 	print('----TRAINING----')
 	classes_count = 8 if fma_set else len(genres)
+	neurons = 14
+	dropout = 0.2
 	model = Sequential([
 		Flatten(input_shape=training_set[0].shape),
-		Dense(256, activation='relu'),
-		Dense(64, activation='relu'),
+		Dense(neurons, activation='relu'),
+		Dropout(dropout),
+		Dense(neurons, activation='relu'),
+		Dropout(dropout),
+		Dense(neurons, activation='relu'),
+		Dropout(dropout),
+		Dense(neurons, activation='relu'),
+		Dropout(dropout),
+		Dense(neurons, activation='relu'),
+		Dropout(dropout),
+		Dense(neurons, activation='relu'),
+		Dropout(dropout),
+		Dense(neurons, activation='relu'),
+		Dropout(dropout),
+		Dense(neurons, activation='relu'),
+		Dropout(dropout),
 		Dense(classes_count, activation='softmax'),
 	])
 	model_metrics = [metrics.CategoricalAccuracy(), metrics.Recall(), metrics.AUC(),
@@ -65,7 +96,14 @@ def train_network(training_set, training_labels, fma_set=True, save_path='networ
 	print(model.summary())
 
 	train_time = time.time_ns()
-	history = model.fit(training_set, training_labels, epochs=5, batch_size=32, validation_split=0)
+	early_stop = EarlyStopping(monitor='loss', patience=2)
+	test_callback = TestCallback((testing_set, testing_labels))
+	history = model.fit(training_set, training_labels, epochs=25, batch_size=32, validation_split=0, callbacks=[test_callback, early_stop])
+	pyplot.plot(history.history['loss'], label='train loss')
+	pyplot.plot(test_callback.history['loss'], label='test loss')
+	pyplot.legend()
+	pyplot.show()
+
 	print((time.time_ns() - train_time) / 1000000)
 	print(str(history.history['loss'])[1:-1].replace(',', ''))
 	print(str(history.history['categorical_accuracy'])[1:-1].replace(',', ''))
