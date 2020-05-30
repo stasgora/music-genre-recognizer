@@ -48,8 +48,7 @@ def test_network(testing_set, testing_labels, network_path):
 	train_time = time.time_ns()
 	history = model.evaluate(testing_set, testing_labels)
 	print((time.time_ns() - train_time) / 1000000)
-	print(history[0])
-	print(history[1])
+	print(' '.join([str(round(x, 3)) for x in history]))
 
 
 def train_network(training_set, training_labels, testing_set, testing_labels, fma_set=True, save_path='network.keras'):
@@ -60,22 +59,8 @@ def train_network(training_set, training_labels, testing_set, testing_labels, fm
 	dropout = 0.2
 	model = Sequential([
 		Flatten(input_shape=training_set[0].shape),
-		Dense(neurons, activation='relu'),
-		Dropout(dropout),
-		Dense(neurons, activation='relu'),
-		Dropout(dropout),
-		Dense(neurons, activation='relu'),
-		Dropout(dropout),
-		Dense(neurons, activation='relu'),
-		Dropout(dropout),
-		Dense(neurons, activation='relu'),
-		Dropout(dropout),
-		Dense(neurons, activation='relu'),
-		Dropout(dropout),
-		Dense(neurons, activation='relu'),
-		Dropout(dropout),
-		Dense(neurons, activation='relu'),
-		Dropout(dropout),
+		Dense(256, activation='relu'),
+		Dense(64, activation='relu'),
 		Dense(classes_count, activation='softmax'),
 	])
 	model_metrics = [metrics.CategoricalAccuracy(), metrics.Recall(), metrics.AUC(),
@@ -85,15 +70,25 @@ def train_network(training_set, training_labels, testing_set, testing_labels, fm
 
 	train_time = time.time_ns()
 	early_stop = EarlyStopping(monitor='val_loss', patience=2)
-	history = model.fit(training_set, training_labels, epochs=30, batch_size=32, validation_data=(testing_set, testing_labels), callbacks=[early_stop])
-	pyplot.plot(history.history['loss'], label='train loss')
-	pyplot.plot(history.history['val_loss'], label='test loss')
-	pyplot.legend()
-	pyplot.show()
+	history = model.fit(training_set, training_labels, epochs=20, batch_size=32, validation_data=(testing_set, testing_labels), callbacks=[early_stop])
+	#pyplot.plot(history.history['recall'], label='Training Recall')
+	#pyplot.plot(history.history['val_recall'], label='Validation Recall')
+	#pyplot.plot(history.history['auc'], label='Training AUC')
+	#pyplot.plot(history.history['val_auc'], label='Validation AUC')
+	#pyplot.plot(history.history['sensitivity_at_specificity'], label='Training Sensitivity')
+	#pyplot.plot(history.history['val_sensitivity_at_specificity'], label='Validation Sensitivity')
+	#pyplot.plot(history.history['specificity_at_sensitivity'], label='Training Specificity')
+	#pyplot.plot(history.history['val_specificity_at_sensitivity'], label='Validation Specificity')
+	#pyplot.plot(history.history['f1_score'], label='Training F1-Score')
+	#pyplot.plot(history.history['val_f1_score'], label='Validation F1-Score')
+	#pyplot.plot(history.history['fbeta_score'], label='Training FBeta-Score')
+	#pyplot.plot(history.history['val_fbeta_score'], label='Validation FBeta-Score')
+	#pyplot.legend()
+	#pyplot.show()
 
-	print((time.time_ns() - train_time) / 1000000)
-	print(str(history.history['loss'])[1:-1].replace(',', ''))
-	print(str(history.history['categorical_accuracy'])[1:-1].replace(',', ''))
+	#print((time.time_ns() - train_time) / 1000000)
+	#print(str(history.history['loss'])[1:-1].replace(',', ''))
+	#print(str(history.history['categorical_accuracy'])[1:-1].replace(',', ''))
 
 	model.save(save_path)
 
