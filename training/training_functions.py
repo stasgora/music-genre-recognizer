@@ -52,18 +52,6 @@ def test_network(testing_set, testing_labels, network_path):
 	print(history[1])
 
 
-class TestCallback(Callback):
-	def __init__(self, test_data):
-		self.test_data = test_data
-		self.history = {'loss': [], 'f1': []}
-
-	def on_epoch_end(self, epoch, logs={}):
-		x, y = self.test_data
-		history = self.model.evaluate(x, y, verbose=1)
-		self.history['loss'].append(history[0])
-		self.history['f1'].append(history[7])
-
-
 def train_network(training_set, training_labels, testing_set, testing_labels, fma_set=True, save_path='network.keras'):
 	global model
 	print('----TRAINING----')
@@ -96,11 +84,10 @@ def train_network(training_set, training_labels, testing_set, testing_labels, fm
 	print(model.summary())
 
 	train_time = time.time_ns()
-	early_stop = EarlyStopping(monitor='loss', patience=2)
-	test_callback = TestCallback((testing_set, testing_labels))
-	history = model.fit(training_set, training_labels, epochs=25, batch_size=32, validation_split=0, callbacks=[test_callback, early_stop])
+	early_stop = EarlyStopping(monitor='val_loss', patience=2)
+	history = model.fit(training_set, training_labels, epochs=30, batch_size=32, validation_data=(testing_set, testing_labels), callbacks=[early_stop])
 	pyplot.plot(history.history['loss'], label='train loss')
-	pyplot.plot(test_callback.history['loss'], label='test loss')
+	pyplot.plot(history.history['val_loss'], label='test loss')
 	pyplot.legend()
 	pyplot.show()
 
